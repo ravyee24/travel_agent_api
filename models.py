@@ -1,15 +1,20 @@
+# from dotenv import load_dotenv
+# from langchain_mistralai import ChatMistralAI
+# from langchain_mistralai.embeddings import MistralAIEmbeddings
+# from langchain_nvidia_ai_endpoints import ChatNVIDIA
+# from langchain_huggingface import HuggingFaceEndpoint,ChatHuggingFace
+
+
 from dotenv import load_dotenv
-from langchain_mistralai import ChatMistralAI
-from langchain_mistralai.embeddings import MistralAIEmbeddings
-from langchain_nvidia_ai_endpoints import ChatNVIDIA
-from langchain_huggingface import HuggingFaceEndpoint,ChatHuggingFace
 
 load_dotenv()
 
 from langchain_groq import ChatGroq
 
-llm = ChatGroq(model="openai/gpt-oss-120b",temperature=0.2)
-
+llm = ChatGroq(
+    model="openai/gpt-oss-120b",
+    temperature=0.2,
+)
 # loading the model 
 # llm = ChatMistralAI(model="mistral-medium-3-5")
 

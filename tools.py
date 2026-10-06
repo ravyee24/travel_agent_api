@@ -1,17 +1,17 @@
-from dotenv import load_dotenv
-from models import llm
-from langchain_core.tools import tool
-from tavily import TavilyClient
-import os
-
-load_dotenv()
-
-
+from dotenv import load_dotenv 
+from models import llm 
+from langchain_core.tools import tool 
+from tavily import TavilyClient 
+import os 
+load_dotenv() 
 tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-#MAKING THE FLIGHT SEARCH TOOL
+# --------------------------------------------------
+# Flight Search Tool
+# --------------------------------------------------
+
 @tool
-def GetFlight(
+async def GetFlight(
     current_loc: str,
     destination_loc: str,
     date: str
@@ -33,7 +33,7 @@ def GetFlight(
     Do not invent information.
     """
 
-    response = tavily.search(
+    response = await tavily.search(
         query=query,
         max_results=3,
         search_depth="advanced"
@@ -51,10 +51,12 @@ def GetFlight(
     return str(results)
 
 
+# --------------------------------------------------
+# Hotel Search Tool
+# --------------------------------------------------
 
-#MAKING THE TOOL FOR HOTELS
 @tool
-def GetHotels(address: str) -> str:
+async def GetHotels(address: str) -> str:
     """Search hotels and return concise hotel information."""
 
     prompt = f"""
@@ -70,7 +72,7 @@ def GetHotels(address: str) -> str:
     Do not invent information.
     """
 
-    response = tavily.search(
+    response = await tavily.search(
         query=prompt,
         max_results=3,
         search_depth="advanced"
@@ -87,9 +89,13 @@ def GetHotels(address: str) -> str:
 
     return str(results)
 
-#MAKING TOOL FOR SEARCH PLACES.
+
+# --------------------------------------------------
+# Places Search Tool
+# --------------------------------------------------
+
 @tool
-def GetPlaces(destination: str) -> str:
+async def GetPlaces(destination: str) -> str:
     """Find attractions and popular things to do in a destination."""
 
     prompt = f"""
@@ -105,7 +111,7 @@ def GetPlaces(destination: str) -> str:
     Do not invent information.
     """
 
-    response = tavily.search(
+    response = await tavily.search(
         query=prompt,
         max_results=4,
         search_depth="advanced"
@@ -123,7 +129,10 @@ def GetPlaces(destination: str) -> str:
     return str(results)
 
 
-# MAKING TOOL FOR CALCULATING BUDGET
+# --------------------------------------------------
+# Budget Calculator
+# --------------------------------------------------
+
 @tool
 def CalculateBudget(
     flight: float,
@@ -134,7 +143,13 @@ def CalculateBudget(
 ) -> dict:
     """Calculate total trip expenses and compare them with the user's budget."""
 
-    total_cost = flight + hotel + place_visit + food_estimate
+    total_cost = (
+        flight
+        + hotel
+        + place_visit
+        + food_estimate
+    )
+
     remaining = total_budget - total_cost
 
     return {
@@ -147,70 +162,3 @@ def CalculateBudget(
         "remaining": remaining,
         "within_budget": remaining >= 0
     }
-
-
-
-# #MAKING THE TOOL FOR CREATING THE ITINERARY
-# @tool
-# def CreateItinerary(flight_data:str,
-#                     hotel_data:str,
-#                     places_to_visit:str,
-#                     budget:str
-#                     ) -> str:
-#     """ Create a schedule for trip details."""
-
-#     prompts = f"""
-#     Create a complete travel itinerary using the information below.
-
-#     FLIGHT DETAILS:
-#     {flight_data}
-
-#     HOTEL DETAILS:
-#     {hotel_data}
-
-#     PLACES TO VISIT:
-#     {places_to_visit}
-
-#     BUDGET DETAILS:
-#     {budget}
-
-#     Create the itinerary with:
-
-#     1. Flight details
-#        - Origin
-#        - Destination
-#        - Date
-#        - Time
-#        - Price
-#        - Airline
-
-#     2. Hotel details
-#        - Hotel name
-#        - Location
-#        - Price per night
-#        - Star rating
-
-#     3. Day-by-day itinerary
-#        - Places to visit each day
-#        - Things to do
-#        - Popular food
-#        - Cultural experiences
-
-#     4. Budget summary
-#        - Total budget
-#        - Flight cost
-#        - Hotel cost
-#        - Food cost
-#        - Activity cost
-#        - Total expenses
-#        - Remaining budget
-
-#     5. If the trip is over budget, suggest cheaper alternatives.
-
-#     Do not invent information that is not present in the provided data.
-#     """
-
-#     response = llm.invoke(prompts)
-
-#     return f"The necessary itinerary for the trip is{response.content}."
-
