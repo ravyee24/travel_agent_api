@@ -4,6 +4,7 @@ from langchain_core.tools import tool
 from tavily import TavilyClient 
 import os 
 load_dotenv() 
+
 tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 # --------------------------------------------------
